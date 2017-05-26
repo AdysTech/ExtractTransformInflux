@@ -61,7 +61,7 @@ begin{
 process{
     $recordsProcessed = 0
 
-    $tagFilter = [string]::Join(" OR ",($oldTagSet | foreach { "$($_.Tag) = '$($_.Value)'"}))
+    $tagFilter = [string]::Join(" OR ",@($oldTagSet | foreach { "$($_.Tag) = '$($_.Value)'"}))
     $whereClaus = if ($oldTagSet.count -gt 0 -and -not [string]::IsNullOrEmpty($additionalFilter)){
         "where $tagFilter AND $additionalFilter"
     } elseif ($oldTagSet.count -gt 0) {
