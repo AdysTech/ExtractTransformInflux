@@ -16,7 +16,7 @@ This script allows to extract data stored in an Influx time series measurement i
         URL for the Influxdb query entry point (usually 8086 port), include the DB name as well e.g. "http://localhost:8086/query?db=InfluxerDB"
 
 #####    -measurement <String>
-        measurment to query from
+        measurement to query from
 
 #####    -oldTags <String>
         List of tags and their values to be replaced. Usage Pattern: <Tag=Value>. Separate multiple tags by a ;. e.g. "AppName=App1;Release=Beta". Optional parameter.
@@ -43,12 +43,25 @@ This script allows to extract data stored in an Influx time series measurement i
         output time format when the -outtype is text, default will be upto micro second precision yyyy-MM-dd-hh.mm.ss.ffffff
 
 ### Usage
+#### Extract & Transform
 ```powershell
 .\ExtractTransformInflux.ps1 -influxBaseUrl "http://localhost:8086/query?db=TestDB" -measurement "MyMeasurement"  -oldTags "AppName=App1;Release=Beta" -newTags "AppName=MyApplication;Release=Pre_Beta"
 ```
 
+#### Insert back to Influx
+Once downloaded data can then be inserted back into Influx using the [Influxer](https://github.com/AdysTech/Influxer) using command link this
+```
+1. Generate a column config
+ influxer.exe -format Generic -input InfluxDump.csv -TimeFormat "yyyy-MM-dd-hh.mm.ss.ffffff" -Precision Microseconds -splitter "," /export /autolayout > influxer.config
+
+2. Customize the config as needed - edit the retention policy name, table name etc
+
+3. influxer.exe -format Generic -input InfluxDump.csv -config influxer.config 
+
+```
+
 ## show-InfluxTagCardinality
-This script calculates the [tag value cardinality](https://docs.influxdata.com/influxdb/v1.7/query_language/spec/#show-tag-values-cardinality). InfluxDB native implementation gives the value caridinality per tag key. But in real world situations we might want to know the unique values of one tag given each unique values of another tag. e.g. assume we track no sessions served by various docker instances, source IP, and geo location. So if we have to calculate number of unique IP address per geo location, default influx is not straight forward. This script comes handy in those situations.
+This script calculates the [tag value cardinality](https://docs.influxdata.com/influxdb/v1.7/query_language/spec/#show-tag-values-cardinality). InfluxDB native implementation gives the value cardinality per tag key. But in real world situations we might want to know the unique values of one tag given each unique values of another tag. e.g. assume we track no sessions served by various docker instances, source IP, and geo location. So if we have to calculate number of unique IP address per geo location, default influx is not straight forward. This script comes handy in those situations.
 
 #### SYNTAX
     show-InfluxTagCardinality.ps1 [-influxBaseUrl] <String> [-measurement] <String> [[-tags] <String[]>]
